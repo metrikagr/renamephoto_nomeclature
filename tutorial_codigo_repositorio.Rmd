@@ -1,0 +1,79 @@
+---
+title: "Notas de renombre de imagenes"
+author: "Omar E. Benites Alfaro"
+date: "28/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tutorial del código fuente del repositorio
+
+En este tutorial detallamos la organización de las fotos de las variedades y R-scripts usados para el renombramiento de las fotos. Colocamos en orden cronológico ambas actividades para que tener una guia resumen de todas las actividades que involucra.
+
+Las librerias en R usadas para el uso adecuado de este repositorio son
+
+```{r}
+install.packages("tidyverse")
+install.packages("googledrive")
+install.packages("googlesheets4")
+install.packages("stringi")
+install.packages("writexl")
+install.packages("data.table")
+```
+
+Una vez instaladas las librerias, podemos proceder a ejecución de los R-scripts que nos ayudan a renombrar las fotos de las variedades. A continuación los pasos a seguir:
+
+
+### 1. Organizacion de los archivos
+
+- Se subieron al GDrive según el nombre de cada localidad: Huancavelica, Junín, Pataz y Bolivia
+
+
+- Estas carpetas tenian las fotos de la forma i) todas las fotos de las variedades en una sola carpeta y ii) cada variedad con una carpeta y sus respectivamente.
+
+- Si renombramos directamente en el google drive, tenemos que generar un token de autenticacion y guardarlo en un archivo `.rds`. Para generar un token ir al archivo `generar_token.R`. Corren el archivo y guardan sus credenciales en una carpeta llamada `token`.
+
+
+### 2. Script de renombramientos
+
+Los script estan divididos 
+
+#### 2.1 Inventario de Fotos Crudas de Variedades
+
+- En el folder `inventario_fotosvariedades_crudas` están los scripts
+    * El script `inventario_fotos_crudas.R` genera el archivo excel  `invetario_photos_catalogo_papa.xlsx` que contiene el inventario de las fotos crudas. Este excel contiene las cabezeras de nombre la imagen cruda, nombre del variedad, la parte del planta de la foto, el folder del archivo, el sub folder, el formato, y el código de la foto. Este script lista las fotos del GDrive. 
+
+
+#### 2.2 Inventario de Fotos Renombradas
+
+- En el folder `inventario_fotosvariedades_renombradas` contiene:
+    * Los scripts `workflow_junin16.R`, `workflow_hcva21.R`, `workflow_hcva06.R`, `workflow_chupataz16.R` y `workflow_bolivia2021.R`, los cuales leen el archivo del inventario de fotos crudas de (2.1) y generan un inventario de fotos renombradas para cada grupo de fotos segun su locailidad.
+    * Estos scripts cruzan información la base de datos de variedades y el inventario de fotos crudas.
+    * La columna **nomenclature** contiene el nombre las fotos de las variedades renombradas
+    * Los archivos de excel `inv_ren_junin_2016.xlsx`, `inv_ren_hcva_2021.xlsx`, `inv_ren_hcva_2006.xlsx`, `inv_ren_chupataz_2016.xlsx` y `inv_ren_bolivia_2016.xlsx` contienen el inventario de las fotos renombradas según la localidad.
+
+### 3. Subir inventarios y fotos de variedades renombradas a GDrive
+
+- Los folder de las fotos renombradas según su localidad son subidas al GDrive para ser utilizadas en la web de Wiki Papa (front end).
+
+- Los inventarios de fotos renombradas (excel) son subidos al GDrive para luego ser usados en la web de Wiki Papa (backend)   
+
+
+### Notas
+
+El proceso de renombramiento conlleva una curación de datos (data quality) importante por parte del analista de datos. Entre los principales problemas encontramos:
+
+- Si existen carácteres especiales (comillas, apostrofes, etc) en el nombre de las variedades, es mejor transformar en una nueva columna estos valores a formato **utf_8** usando la función  `stringi::stri_trans_general(columna, "latin-ascii")`. Ej.: la columna nombre_variedad con caracteres especiales, crear una copia como nombre_variedad_utf8. 
+ 
+- Cuando se hace el inventario crudo de las imagenes (sin renombrar), ver que el nombre de las variedades coincida el nombre de las variedades de la base de datos.
+Ej.: En la base de datos aparece la variedad `UPLLA SUMA`, y en el listado sin renombrar sale como `UPYA SUMA`; solamente diferenciadas por la Y y LL.
+
+- Si las fotos crudas tienen como nombre algun tipo de código (ej. aylmm22), se debe contar con el significado del código para poder renombrar la foto usando el nombre la variedad.
+
+- En lo posible el nombre de la foto-cruda de las variedades debe tener algún tipo de tag respecto a la parte de la planta. Ej.: PAPA_SANGRE_TORO-h, donde h significa hoja.
+
+
+
